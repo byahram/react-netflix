@@ -49,7 +49,7 @@ function Header() {
   };
 
   useMotionValueEvent(scrollY, "change", (y) => {
-    console.log(y);
+    // console.log(y);
 
     if (y > 80) {
       navAnimation.start("scroll");
