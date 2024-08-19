@@ -3,9 +3,9 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import { RecoilRoot } from "recoil";
 import { ThemeProvider } from "styled-components";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { theme } from "./Theme/theme.ts";
 import GlobalStyle from "./Styles/GlobalStyle.tsx";
-import { QueryClient, QueryClientProvider } from "react-query";
 
 const client = new QueryClient();
 

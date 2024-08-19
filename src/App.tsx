@@ -2,22 +2,24 @@ import {
   BrowserRouter as BrowserRouter,
   Routes,
   Route,
+  Navigate,
 } from "react-router-dom";
 
-import Header from "./Components/Header.tsx";
-import Search from "./Routes/Search.tsx";
-import Tv from "./Routes/Tv";
-import Home from "./Routes/Home.tsx";
+import Header from "./components/Header.tsx";
+import Search from "./pages/Search.tsx";
+import Tv from "./pages/Tv.tsx";
+import Movie from "./pages/Movie.tsx";
 
 function App() {
   return (
     <BrowserRouter>
       <Header />
       <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="/movies/:movieId" element={<Home />}></Route>
-        <Route path="/tv" element={<Tv />}></Route>
-        <Route path="/search" element={<Search />}></Route>
+        <Route path="/" element={<Navigate replace to="/movie" />}></Route>
+        <Route path="movie" element={<Movie />}></Route>
+        <Route path="tv" element={<Tv />}></Route>
+        {/* <Route path="/search" element={<Search />}></Route> */}
+        {/* <Route path={"*"} element={<NotFound />}/> */}
       </Routes>
     </BrowserRouter>
   );

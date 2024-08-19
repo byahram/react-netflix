@@ -1,82 +1,108 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { motion, AnimatePresence } from "framer-motion";
-import { getMovies } from "../api/api";
+import { getMovieLists } from "../api/api";
 import { IGetMoviesResult } from "../api/interface";
 import { makeImagePath } from "../api/utils";
 import { useState } from "react";
 import { PathMatch, useMatch, useNavigate } from "react-router-dom";
+import Banner from "../components/Banner";
 
-const RowVariants = {
-  hidden: {
-    x: window.outerWidth + 5,
-  },
-  visible: {
-    x: 0,
-  },
-  exit: {
-    x: -window.outerWidth - 5,
-  },
-};
+// const RowVariants = {
+//   hidden: {
+//     x: window.outerWidth + 5,
+//   },
+//   visible: {
+//     x: 0,
+//   },
+//   exit: {
+//     x: -window.outerWidth - 5,
+//   },
+// };
 
-const BoxVariants = {
-  normal: {
-    scale: 1,
-  },
-  hover: {
-    scale: 1.3,
-    y: -80,
-    transition: {
-      delay: 0.5,
-      duaration: 0.1,
-      type: "tween",
-    },
-  },
-};
+// const BoxVariants = {
+//   normal: {
+//     scale: 1,
+//   },
+//   hover: {
+//     scale: 1.3,
+//     y: -80,
+//     transition: {
+//       delay: 0.5,
+//       duaration: 0.1,
+//       type: "tween",
+//     },
+//   },
+// };
 
-const InfoVariants = {
-  hover: {
-    opacity: 1,
-    transition: {
-      delay: 0.5,
-      duaration: 0.1,
-      type: "tween",
-    },
-  },
-};
+// const InfoVariants = {
+//   hover: {
+//     opacity: 1,
+//     transition: {
+//       delay: 0.5,
+//       duaration: 0.1,
+//       type: "tween",
+//     },
+//   },
+// };
 
-const offset = 6;
+// const offset = 6;
 
 function Home() {
-  const navigate = useNavigate();
-  const bigMovieMatch: PathMatch<string> | null = useMatch("/movies/:movieId");
-  // console.log(bigMovieMatch);
+  // const navigate = useNavigate();
+  // const bigMovieMatch: PathMatch<string> | null = useMatch("/movies/:movieId");
 
-  const { data, isLoading } = useQuery<IGetMoviesResult>(
-    ["movies", "nowPlaying"],
-    getMovies
-  );
+  // now_playing
+  const { data: nowPlayingList, isLoading: loadingNowPlaying } =
+    useQuery<IGetMoviesResult>(["movies", "nowPlaying"], () =>
+      getMovieLists("now_playing")
+    );
+  console.log("nowPlayingList::: ", nowPlayingList);
 
-  const [index, setIndex] = useState(0);
-  const [leaving, setLeaving] = useState(false);
+  // popular
+  const { data: popularList, isLoading: loadingPopular } =
+    useQuery<IGetMoviesResult>(["movies", "popular"], () =>
+      getMovieLists("popular")
+    );
+  console.log("popularList::: ", popularList);
 
-  const incraseIndex = () => {
-    if (data) {
-      if (leaving) return;
-      toggleLeaving();
-      const totalMovies = data.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
-      setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-    }
-  };
-  const toggleLeaving = () => setLeaving((prev) => !prev);
-  const onBoxClicked = (movieId: number) => {
-    navigate(`/movies/${movieId}`);
-  };
-  const onOverlayClick = () => navigate("/");
-  const clickedMovie =
-    bigMovieMatch?.params.movieId &&
-    data?.results.find((movie) => movie.id === +bigMovieMatch.params.movieId!);
+  // top_rated
+  const { data: topRatedList, isLoading: loadingTopRated } =
+    useQuery<IGetMoviesResult>(["movies", "topRated"], () =>
+      getMovieLists("top_rated")
+    );
+  console.log("topRatedList::: ", topRatedList);
+
+  // upcoming
+  const { data: upcomingList, isLoading: loadingUpcoming } =
+    useQuery<IGetMoviesResult>(["movies", "upcoming"], () =>
+      getMovieLists("upcoming")
+    );
+  console.log("upcomingList::: ", upcomingList);
+
+  const isLoading =
+    loadingNowPlaying || loadingPopular || loadingTopRated || loadingUpcoming;
+
+  // const [index, setIndex] = useState(0);
+  // const [leaving, setLeaving] = useState(false);
+
+  // const increaseIndex = () => {
+  //   if (data) {
+  //     if (leaving) return;
+  //     toggleLeaving();
+  //     const totalMovies = data.results.length - 1;
+  //     const maxIndex = Math.floor(totalMovies / offset) - 1;
+  //     setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+  //   }
+  // };
+  // const toggleLeaving = () => setLeaving((prev) => !prev);
+  // const onBoxClicked = (movieId: number) => {
+  //   navigate(`/movies/${movieId}`);
+  // };
+  // const onOverlayClick = () => navigate("/");
+  // const clickedMovie =
+  //   bigMovieMatch?.params.movieId &&
+  //   data?.results.find((movie) => movie.id === +bigMovieMatch.params.movieId!);
   // console.log(clickedMovie);
 
   return (
@@ -85,14 +111,39 @@ function Home() {
         <Loader>Loading...</Loader>
       ) : (
         <>
-          <Banner
-            onClick={incraseIndex}
+          <Banner section="movie" contents={nowPlayingList?.results[0]} />
+          {/* <Banner
+            onClick={increaseIndex}
             bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}
           >
             <Title>{data?.results[0].title}</Title>
             <Overview>{data?.results[0].overview}</Overview>
-          </Banner>
-          <Slider>
+          </Banner> */}
+          {/* <Slider
+            section="movie"
+            title={t("category.movie.nowPlaying")}
+            list={nowPlayingList}
+            zindex={3}
+          />
+          <Slider
+            section="movie"
+            title={t("category.movie.popular")}
+            list={popularList}
+            zindex={3}
+          />
+          <Slider
+            section="movie"
+            title={t("category.movie.topRated")}
+            list={topRatedList}
+            zindex={2}
+          />
+          <Slider
+            section="movie"
+            title={t("category.movie.upcoming")}
+            list={upcomingList}
+            zindex={1}
+          /> */}
+          {/* <Slider>
             <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
               <Row
                 variants={RowVariants}
@@ -153,7 +204,7 @@ function Home() {
                 </BigMovie>
               </>
             ) : null}
-          </AnimatePresence>
+          </AnimatePresence> */}
         </>
       )}
     </Wrapper>
@@ -173,16 +224,16 @@ const Loader = styled.div`
   align-items: center;
 `;
 
-const Banner = styled.div<{ bgPhoto: string }>`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 60px;
-  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
-    url(${(props) => props.bgPhoto});
-  background-size: cover;
-`;
+// const Banner = styled.div<{ bgPhoto: string }>`
+//   height: 100vh;
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+//   padding: 60px;
+//   background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
+//     url(${(props) => props.bgPhoto});
+//   background-size: cover;
+// `;
 
 const Title = styled.h2`
   font-size: 68px;
